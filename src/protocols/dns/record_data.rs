@@ -1,4 +1,4 @@
-use super::{RecordType, SoaData};
+use super::{DnsError, RecordType, SoaData};
 
 #[derive(Debug)]
 pub enum RecordData {
@@ -38,7 +38,7 @@ impl std::fmt::Display for RecordData {
 }
 
 impl bitstream_io::FromBitStreamWith for RecordData {
-    type Error = anyhow::Error;
+    type Error = DnsError;
     type Context = (Vec<u8>, RecordType);
 
     fn from_reader<R: bitstream_io::BitRead + ?Sized>(

@@ -1,10 +1,11 @@
+use super::DnsError;
 use bitstream_io::{BigEndian, BitRead, BitReader};
 
 #[derive(Debug)]
 pub struct QName(String);
 
 impl bitstream_io::ToBitStream for QName {
-    type Error = anyhow::Error;
+    type Error = DnsError;
 
     fn to_writer<W: bitstream_io::BitWrite + ?Sized>(&self, w: &mut W) -> Result<(), Self::Error>
     where
@@ -12,9 +13,9 @@ impl bitstream_io::ToBitStream for QName {
     {
         for name in self.0.split('.') {
             let len = name.len();
-            let len = u8::try_from(len).map_err(|err| anyhow::anyhow!(err.to_string()))?;
+            let len = u8::try_from(len)?;
             if len >= 64 {
-                return Err(anyhow::anyhow!("QNAME too long"));
+                return Err(DnsError::QNameTooLong(name.into()));
             }
 
             w.write(8, len)?;
@@ -28,7 +29,7 @@ impl bitstream_io::ToBitStream for QName {
 }
 
 impl bitstream_io::FromBitStreamWith for QName {
-    type Error = anyhow::Error;
+    type Error = DnsError;
     type Context = Vec<u8>;
 
     fn from_reader<R: bitstream_io::BitRead + ?Sized>(

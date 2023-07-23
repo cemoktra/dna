@@ -1,4 +1,4 @@
-use super::{Class, QName, RecordType};
+use super::{Class, QName, RecordType, DnsError};
 
 #[derive(Debug)]
 pub struct Question {
@@ -8,7 +8,7 @@ pub struct Question {
 }
 
 impl bitstream_io::ToBitStream for Question {
-    type Error = anyhow::Error;
+    type Error = DnsError;
 
     fn to_writer<W: bitstream_io::BitWrite + ?Sized>(&self, w: &mut W) -> Result<(), Self::Error>
     where
@@ -23,7 +23,7 @@ impl bitstream_io::ToBitStream for Question {
 }
 
 impl bitstream_io::FromBitStreamWith for Question {
-    type Error = anyhow::Error;
+    type Error = DnsError;
     type Context = Vec<u8>;
 
     fn from_reader<R: bitstream_io::BitRead + ?Sized>(

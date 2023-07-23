@@ -1,3 +1,5 @@
+use super::DnsError;
+
 #[derive(Clone, Copy, Debug)]
 #[repr(u8)]
 pub enum ResponseCode {
@@ -10,7 +12,7 @@ pub enum ResponseCode {
 }
 
 impl bitstream_io::ToBitStream for ResponseCode {
-    type Error = anyhow::Error;
+    type Error = DnsError;
 
     fn to_writer<W: bitstream_io::BitWrite + ?Sized>(&self, w: &mut W) -> Result<(), Self::Error>
     where
@@ -22,7 +24,7 @@ impl bitstream_io::ToBitStream for ResponseCode {
 }
 
 impl bitstream_io::FromBitStream for ResponseCode {
-    type Error = anyhow::Error;
+    type Error = DnsError;
 
     fn from_reader<R: bitstream_io::BitRead + ?Sized>(r: &mut R) -> Result<Self, Self::Error>
     where
@@ -36,7 +38,7 @@ impl bitstream_io::FromBitStream for ResponseCode {
             3 => Ok(ResponseCode::NXDomain),
             4 => Ok(ResponseCode::NotImplmented),
             5 => Ok(ResponseCode::Refused),
-            _ => Err(anyhow::anyhow!("{code} is not a valid ResponseCode")),
+            _ => Err(DnsError::InvalidResponseCode(code)),
         }
     }
 }

@@ -1,3 +1,5 @@
+use super::DnsError;
+
 #[derive(Clone, Copy, Debug)]
 #[repr(u16)]
 pub enum RecordType {
@@ -45,7 +47,7 @@ impl std::fmt::Display for RecordType {
 }
 
 impl bitstream_io::ToBitStream for RecordType {
-    type Error = anyhow::Error;
+    type Error = DnsError;
 
     fn to_writer<W: bitstream_io::BitWrite + ?Sized>(&self, w: &mut W) -> Result<(), Self::Error>
     where
@@ -57,7 +59,7 @@ impl bitstream_io::ToBitStream for RecordType {
 }
 
 impl bitstream_io::FromBitStream for RecordType {
-    type Error = anyhow::Error;
+    type Error = DnsError;
 
     fn from_reader<R: bitstream_io::BitRead + ?Sized>(r: &mut R) -> Result<Self, Self::Error>
     where
@@ -83,20 +85,20 @@ impl bitstream_io::FromBitStream for RecordType {
             16 => Ok(Self::TXT),
             28 => Ok(Self::AAAA),
             // TODO
-            _ => Err(anyhow::anyhow!("{code} is not a valid RecordType")),
+            _ => Err(DnsError::InvalidRecordTypeCode(code)),
         }
     }
 }
 
 impl std::str::FromStr for RecordType {
-    type Err = anyhow::Error;
+    type Err = DnsError;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
             "A" => Ok(RecordType::A),
             "AAAA" => Ok(RecordType::AAAA),
             "CNAME" => Ok(RecordType::CNAME),
-            _ => Err(anyhow::anyhow!("{s} is not a valid record type")),
+            _ => Err(DnsError::InvalidRecordType(s.into())),
         }
     }
 }

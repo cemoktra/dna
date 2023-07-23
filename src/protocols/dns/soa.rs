@@ -1,4 +1,4 @@
-use super::QName;
+use super::{QName,DnsError};
 
 #[derive(Debug)]
 pub struct SoaData {
@@ -12,7 +12,7 @@ pub struct SoaData {
 }
 
 impl bitstream_io::FromBitStreamWith for SoaData {
-    type Error = anyhow::Error;
+    type Error = DnsError;
     type Context = Vec<u8>;
 
     fn from_reader<R: bitstream_io::BitRead + ?Sized>(

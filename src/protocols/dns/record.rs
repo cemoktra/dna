@@ -1,4 +1,4 @@
-use super::{Class, QName, RecordData, RecordType};
+use super::{Class, DnsError, QName, RecordData, RecordType};
 
 #[derive(Debug)]
 pub struct Record {
@@ -25,7 +25,7 @@ impl std::fmt::Display for Record {
 }
 
 impl bitstream_io::FromBitStreamWith for Record {
-    type Error = anyhow::Error;
+    type Error = DnsError;
     type Context = Vec<u8>;
 
     fn from_reader<R: bitstream_io::BitRead + ?Sized>(

@@ -1,3 +1,5 @@
+use super::DnsError;
+
 #[derive(Clone, Copy, Debug)]
 pub enum Class {
     IN = 1,
@@ -7,7 +9,7 @@ pub enum Class {
 }
 
 impl bitstream_io::ToBitStream for Class {
-    type Error = anyhow::Error;
+    type Error = DnsError;
 
     fn to_writer<W: bitstream_io::BitWrite + ?Sized>(&self, w: &mut W) -> Result<(), Self::Error>
     where
@@ -19,7 +21,7 @@ impl bitstream_io::ToBitStream for Class {
 }
 
 impl bitstream_io::FromBitStream for Class {
-    type Error = anyhow::Error;
+    type Error = DnsError;
 
     fn from_reader<R: bitstream_io::BitRead + ?Sized>(r: &mut R) -> Result<Self, Self::Error>
     where
@@ -31,7 +33,7 @@ impl bitstream_io::FromBitStream for Class {
             2 => Ok(Self::CS),
             3 => Ok(Self::CH),
             4 => Ok(Self::HS),
-            _ => Err(anyhow::anyhow!("{code} is not a valid Class")),
+            _ => Err(DnsError::InvalidClass(code)),
         }
     }
 }

@@ -1,4 +1,4 @@
-use super::{OpCode, ResponseCode};
+use super::{OpCode, ResponseCode, DnsError};
 
 #[derive(Debug)]
 pub struct Header {
@@ -18,7 +18,7 @@ pub struct Header {
 }
 
 impl bitstream_io::ToBitStream for Header {
-    type Error = anyhow::Error;
+    type Error = DnsError;
 
     fn to_writer<W: bitstream_io::BitWrite + ?Sized>(&self, w: &mut W) -> Result<(), Self::Error>
     where
@@ -43,7 +43,7 @@ impl bitstream_io::ToBitStream for Header {
 }
 
 impl bitstream_io::FromBitStream for Header {
-    type Error = anyhow::Error;
+    type Error = DnsError;
 
     fn from_reader<R: bitstream_io::BitRead + ?Sized>(r: &mut R) -> Result<Self, Self::Error>
     where

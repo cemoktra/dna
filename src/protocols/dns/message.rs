@@ -1,4 +1,4 @@
-use super::{Header, Question, Record};
+use super::{DnsError, Header, Question, Record};
 use bitstream_io::{BigEndian, BitRead, BitReader, BitWrite, BitWriter};
 
 #[derive(Debug)]
@@ -11,7 +11,7 @@ pub struct Message {
 }
 
 impl bitstream_io::ToBitStream for Message {
-    type Error = anyhow::Error;
+    type Error = DnsError;
 
     fn to_writer<W: bitstream_io::BitWrite + ?Sized>(&self, w: &mut W) -> Result<(), Self::Error>
     where
@@ -27,7 +27,7 @@ impl bitstream_io::ToBitStream for Message {
 }
 
 impl bitstream_io::FromBitStreamWith for Message {
-    type Error = anyhow::Error;
+    type Error = DnsError;
     type Context = Vec<u8>;
 
     fn from_reader<R: bitstream_io::BitRead + ?Sized>(
@@ -84,14 +84,14 @@ impl Message {
         &self.authorities
     }
 
-    pub fn as_bytes(&self) -> anyhow::Result<Vec<u8>> {
+    pub fn as_bytes(&self) -> Result<Vec<u8>, DnsError> {
         let mut data = Vec::with_capacity(512);
         let mut writer = BitWriter::endian(&mut data, BigEndian);
         writer.build(self)?;
         Ok(data)
     }
 
-    pub fn from_bytes(data: &[u8]) -> anyhow::Result<Self> {
+    pub fn from_bytes(data: &[u8]) -> Result<Self, DnsError> {
         let mut cursor = std::io::Cursor::new(&data);
         let mut reader = BitReader::endian(&mut cursor, BigEndian);
         reader.parse_with(&data.to_vec())
